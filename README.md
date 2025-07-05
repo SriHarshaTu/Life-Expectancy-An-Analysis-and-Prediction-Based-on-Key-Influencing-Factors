@@ -21,15 +21,3 @@ This project analyzes the key factors influencing life expectancy across countri
 - **Variables**: Life expectancy, GDP, schooling, mortality rates, immunization rates, alcohol use, BMI, HIV prevalence, etc.
 
 ---
-
-## 📦 Project Structure
-
-```bash
-life_expectancy_analysis_R/
-├── README.md
-├── life_expectancy_analysis.Rmd      # RMarkdown analysis
-├── life_expectancy_analysis.R        # R script version
-├── life_expectancy_data.csv          # Dataset from Kaggle
-├── plots/                            # Folder containing histograms and model diagnostic plots
-├── models/                           # Model summary outputs (e.g., .txt, .RDS)
-└── output/                           # Final refined models and tables
