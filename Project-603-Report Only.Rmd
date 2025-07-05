@@ -1,0 +1,689 @@
+---
+title: "Life Expectancy: An Analysis and Prediction Based on Key Influencing Factors"
+date: "November 30, 2024"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    toc: true
+    number_sections: true
+    fig_caption: true
+  html_document:
+    toc: true
+    df_print: paged
+  word_document:
+    toc: true
+---
+\newpage
+
+# INTRODUCTION
+
+## MOTIVATION 
+
+### Context
+
+Life expectancy is a crucial indicator of a country's overall health and quality of life. It is used by governments, health organizations, and policymakers to measure progress in public health, identify disparities, and allocate resources effectively. By analyzing health, economic, and social indicators, this project aims to uncover the strongest predictors of life expectancy across countries and regions. The applied domain of this research is public health and global development, focusing on the interplay between critical variables such as mortality rates, immunization coverage, and economic conditions. This analysis holds the potential to inform targeted strategies for improving health outcomes worldwide. 
+
+### Problem
+
+The central research question we address is: What are the most significant factors influencing life expectancy across countries and regions? While numerous indicators are believed to impact life expectancy, determining their relative importance and understanding their interactions remain complex tasks. We aim to construct a multiple linear regression model to explore these relationships and provide actionable insights. Specifically, this model will help answer research questions such as: 
+
+* How do immunization rates and healthcare access correlate with life expectancy? 
+
+* What role do socio-economic factors like GDP per capita and schooling play in influencing life expectancy? 
+
+* Are there significant differences in life expectancy predictors across regions? 
+
+### Challenges
+
+This problem presents several challenges: 
+
+**1. Diverse Predictors:** Life expectancy is influenced by a combination of health metrics, socio-economic factors, and categorical variables (e.g., region). Balancing these diverse predictors in a single model can be complex. 
+
+**2. Multicollinearity:** Many predictors, such as infant mortality, under-five mortality, and immunization rates for Diphtheria and Polio, are highly correlated with each other. Although removing the countries column and replacing it with Region has helped reduce multicollinearity, caution is still needed in addressing relationships between these variables. 
+
+**3. Exclusion of Country-Specific Effects:** By removing the countries column and relying on Region instead, we lose the ability to capture country-specific nuances. While regions share common characteristics, individual countries within a region can have significantly different healthcare systems, policies, and socio-economic conditions, which might influence life expectancy in ways that regional-level aggregation cannot fully explain. 
+
+**4. Limited Scope:** Focusing on regions rather than countries simplifies the model and addresses multicollinearity but may overlook important local factors that could affect life expectancy. 
+
+## OBJECTIVES
+
+### Overview
+
+The overall intent of this project is to identify the key factors influencing life expectancy across different countries and regions. By leveraging multiple linear regression, we aim to uncover relationships between life expectancy and various health, economic, and social indicators. The goal is to build a predictive model that highlights which factors have the strongest impact on life expectancy, thereby providing insights that can guide policy decisions and interventions aimed at improving health outcomes worldwide. 
+
+### Goals & Research Questions
+
+The primary goals of this project are to: 
+
+* Develop a multiple linear regression model that identifies and quantifies the relationship between life expectancy and several predictor variables. 
+
+* Investigate how health indicators (e.g., infant mortality, immunization rates), socio-economic factors (e.g., GDP, schooling), and lifestyle factors (e.g., alcohol consumption, BMI) influence life expectancy at a regional level. 
+
+* Provide actionable insights for policymakers by identifying which factors have the most significant impact on life expectancy. 
+
+
+The specific research questions guiding this project are: 
+
+**1. What are the strongest predictors of life expectancy across different regions?**
+
+**2. How do those predictors correlate with life expectancy?**
+
+**3. Are there significant differences in life expectancy predictors across different regions?**
+
+These objectives aim to enhance understanding of life expectancy trends and offer insights into areas for improvement in global health policy. 
+
+
+\newpage
+# METHODOLOGY
+
+## Data
+
+The dataset [\hyperref[Figure 2.1]{Figure 2.1}]  is publicly available under the CC0: Public Domain and can be accessed via Kaggle. The CC0 license allows us to freely use, share and modify it without any legal restrictions, including for any commercial purposes.
+
+The data was compiled by the World Health Organization (WHO) and United Nations. It includes information on global life expectancy and its related factors. The dataset was collected under the conditions of global health surveys conducted by the WHO and related health organizations. The sample size spans 193 countries and includes data from the years 2000 to 2015. The sampling method is based on the available health and demographic data. 
+
+Each row in the dataset represents a country’s life expectancy, along with several demographic and health-related indicators such as income, education and healthcare factors. 
+
+**Response Variable**
+
+The focal response variable for this analysis is Life Expectancy. Life expectancy is a quantitative, continuous variable representing the average number of years a person is expected to live, based on statistical averages. It is measured in years and is recorded with whole values. 
+
+**Predictor Variables**
+
+***1. Country***
+
+Country is a qualitative variable that represents the name of the country for each observation. While not used directly in the analysis, this variable helps to identify the data for each country.
+
+***2.Region***
+
+Region is a qualitative variable representing the geographic region to which each country belongs. This variable is crucial for grouping countries based on regional similarities 
+
+***3. Year***
+
+Year is a qualitative variable that represents the specific year in which the data was collected. It spans from 2000 to 2015 and serves as a categorical identifier for different time periods. The inclusion of this variable allows us to analyze trends in life expectancy over time and examine how health, socio-economic, and environmental factors evolve from year to year. 
+
+***4. Infant deaths***
+
+Infant Deaths is a quantitative variable that measures the number of infant deaths per 1,000 live births. Infant mortality is a critical indicator of a country's healthcare quality, particularly in terms of prenatal and neonatal care. 
+
+***5. Under five deaths***
+
+Under 5 deaths is a quantitative variable representing the number of deaths of children under 5 per 1000 live births. This indicator is a key measure of healthcare quality and child health, reflecting the effectiveness of healthcare systems in preventing early childhood deaths. 
+
+***6. Adult mortality***
+
+Adult mortality is a quantitative variable measures the number of deaths pers 1000 adults aged 15-60 years. This indicator is often used as a proxy for healthcare quality and public health, as higher mortality rates in this age group typically reflect poor healthcare infrastructure or insufficient public health systems. 
+
+***7. Alcohol consumption***
+
+Alcohol consumption is a quantitative variable measured in litres per capita. This variable represents the average amount of alcohol consumed per person in a country. High levels of alcohol consumption are linked to various health issues, including liver disease, accidents, and chronic illnesses, all of which can reduce life expectancy. 
+
+***8. Hepatitis B***
+
+Hepatitis B is a quantitative variable that represents the percentage of the population with chronic hepatitis B infection. Hepatitis B is a significant risk factor for liver disease and can reduce life expectancy, particularly in countries with high prevalence rates. 
+
+***9. Measles***
+
+Measles is a quantitative variable representing the number of reported measles cases per 1,000 people. Measles is a preventable disease, and high rates of measles are often indicative of poor vaccination coverage or inadequate healthcare systems, both of which can negatively impact life expectancy. 
+
+***10. BMI***
+
+BMI is a quantitative variable that measures the average BMI of the population. High BMI values, particularly those indicating obesity, are associated with numerous health risks, including cardiovascular disease and diabetes, which can lower life expectancy. 
+
+***11. Polio***
+
+Polio is a quantitative variable that measures the percentage of children who have received the polio vaccine. High vaccination rates are typically associated with better public health outcomes and lower rates of infectious diseases, which contribute to higher life expectancy. 
+
+**12. Diphtheria***
+
+Diphtheria is a quantitative variable that measures the percentage of children vaccinated against diphtheria. High vaccination coverage for diphtheria indicates better healthcare systems and disease prevention efforts, which are correlated with longer life expectancy. 
+
+**13. Incidents HIV**
+
+Incidents HIV is a quantitative variable that measures the percentage of the adult population living with HIV. The disease has a significant impact on mortality rates, especially in countries with high infection rates. 
+
+***14. GDP per capita***
+
+GDP is a quantitative variable that measures a country’s total economic output, divide by its population. It is reported in USD. GDP per capita serves as an indicator of a country's economic prosperity, with higher GDP typically associated with better healthcare access, improved infrastructure, and overall higher living standards. 
+
+***15. Population***
+
+Population is a quantitative variable that represents the total population of each country in the dataset. This variable, while not directly influencing life expectancy in a causal sense, helps contextualize the data, especially when comparing countries of different sizes. 
+
+***16. Thinness 10-19 years***
+
+Thinness 10-19 is a quantitative variable that represents the percentage of the population aged 10-19 years with a BMI below the healthy range. High rates of thinness in this age group may indicate malnutrition or insufficient healthcare, both of which can reduce life expectancy. 
+
+***17. Thinness 5-9 years***
+
+Thinness 5-9 is a quantitative variable that represents the percentage of children aged 5-9 years who are underweight (based on BMI). High thinness rates in children are indicative of poor nutrition, which can adversely affect child development and overall life expectancy in the population. 
+
+***18. Schooling***
+
+Schooling is a quantitative variable that measures the average number of years of schooling in a country. This indicator is important because higher educational attainment is associated with better health literacy, healthier behaviors, and greater access to healthcare resources. 
+
+***19. Economy Status***
+
+Economic Status is a qualitative variable that classifies countries based on their development status, typically categorized as developed or developing. Developed countries tend to have higher levels of healthcare infrastructure, better education systems, and more robust social services, which all contribute to longer life expectancy. 
+
+### Data Distribution
+
+We analyzed the distribution of key variables, including Region, Year, GDP, economic status, infant mortality, adult mortality, Polio, BMI, Schooling, Incidents HIV, Hepatitis B, Diphtheria, Measles and alcohol consumption. Below are the histograms illustrating the spread and skewness of each variable in our dataset.
+
+[\hyperref[Figure 2.2]{Figure 2.2}] 
+
+[\hyperref[Figure 2.3]{Figure 2.3}] 
+
+[\hyperref[Figure 2.4]{Figure 2.4}] 
+
+[\hyperref[Figure 2.5]{Figure 2.5}] 
+
+[\hyperref[Figure 2.6]{Figure 2.6}] 
+
+[\hyperref[Figure 2.7]{Figure 2.7}] 
+
+[\hyperref[Figure 2.8]{Figure 2.8}] 
+
+[\hyperref[Figure 2.9]{Figure 2.9}] 
+
+[\hyperref[Figure 2.10]{Figure 2.10}] 
+
+[\hyperref[Figure 2.11]{Figure 2.11}] 
+
+[\hyperref[Figure 2.12]{Figure 2.12}] 
+
+[\hyperref[Figure 2.13]{Figure 2.13}] 
+
+[\hyperref[Figure 2.14]{Figure 2.14}] 
+
+[\hyperref[Figure 2.15]{Figure 2.15}] 
+
+
+
+## Approach
+
+For our data analytics solution, we utilized a dataset sourced from Kaggle. This dataset provides information on various factors related to life expectancy across 173 countries, with one column specifically labeled "Country." Since we have multiple independent variables influencing the dependent variable, Life Expectancy, we will employ Multiple Linear Regression to analyze and model these relationships effectively. Due to the complexity of handling individual countries and creating sub-models for each, as advised by our instructor, we used the Region column. This approach helped simplify the analysis and provided meaningful regional insights. 
+
+We started by creating a first-order model by eliminating the Country column. To ensure the robustness of this model, we applied the multicollinearity assumption by using statistical measures like Variance Inflation Factor (VIF). Based on the results of the multicollinearity check, we refined the model by removing highly correlated variables and built a second version of the model. To assess the significance of the predictors, we performed the F-test for overall model significance and t-tests for individual predictors. Using these results, we created a refined model that only included statistically significant terms. Next, we implemented stepwise regression using stepmod and evaluated the model using criteria such as Akaike Information Criterion (AIC), Bayesian Information Criterion (BIC), and Mallows’ Cp to verify the model's validity and select the best fit.  
+
+Additionally, we create an interaction model. From this interaction model, we extended our analysis to a Higher-order model to capture any non-linear relationships among predictors. The Higher-order model was tested to determine if it was a better fit for the data. If the model contained significant terms, it was considered a valid model and was retained for further analysis. Finally, we performed model evaluation and checked for adherence to residual assumptions, including normality, independence, and homoscedasticity, to ensure the model's reliability. This systematic approach allowed us to refine the model step by step, ensuring it was both statistically sound and predictive.  
+
+By following this method, we ensured that our model accounted for the complexity of the data while maintaining interpretability. The use of statistical tests and validation techniques made the approach robust, and we are confident it will provide meaningful and reliable insights for the data analytics solution. 
+
+
+## Workflow
+
+For this project, we followed a structured approach to model development, which can be broken down into several key tasks. Below is a detailed workflow [\hyperref[Figure 2.1]{Figure 2.1}] outlining the steps we undertook, the challenges faced, and how we dealt with any difficulties. 
+
+**1. Getting the Data:**
+
+We started by acquiring a dataset from Kaggle, which contained various variables related to life expectancy across world. One of the columns, Country, had data for 173 countries. Due to the high number of unique values in this column, creating separate sub-models for each country would have been impractical. Following the advice of our instructor, we decided to focus on the Region column instead, which making the modeling process more manageable. 
+
+**2. Data Cleaning and Model Initialization:**
+
+After not considering the Country column, we created a first-order model using the remaining variables. This model provided a baseline for further analysis. 
+
+**3. Multicollinearity Testing:**
+
+We applied the assumption of multicollinearity by calculating the Variance Inflation Factor (VIF) for each predictor in the model and we plot a graph for highly correlated terms. The goal was to identify any highly correlated variables that might distort the model's performance. Based on the results, we eliminated some variables that showed high multicollinearity, ensuring that our model remained stable and reliable. 
+
+**4. Performing F-test and Individual t-tests:**
+
+Once we cleaned the model by addressing multicollinearity, we performed an F-test to check the overall significance of the model and individual t-tests to assess the significance of each predictor. By evaluating these tests, we were able to refine our model and eliminate any non-significant terms. 
+
+**5. Stepwise Model Refinement:**
+
+To further improve the model, we applied stepwise regression using the stepmod function. This iterative process helped us identify and retain only the most significant terms. Additionally, we calculated evaluation criteria such as AIC, BIC, and Mallows' Cp to verify the adequacy of the model. 
+
+
+**6. Creating Interaction Terms:**
+
+After refining the model, we created interaction terms to capture the relationships between different predictors. This step was crucial for identifying potential synergies between variables. If any interaction terms proved to be non-significant, we removed them and repeated this process until we were left with only significant terms. This approach helped ensure that our model was both interpretable and valid. 
+
+**7. Exploring High-Correlation Terms and Higher-Order Models:**
+
+Using the GGally package, we created a plot to identify the terms with the highest correlations. Based on these findings, we selected the most highly correlated terms and tested higher-order models incorporating them. If the addition of a higher-order term was statistically significant and the adjusted R-squared (R²_adj) value increased, we proceeded to include higher-order terms. If the additional term did not improve the model, we reverted to the previous model with one less term. We continued this process by moving to the next higher-order term and repeating the evaluation until all terms with higher correlation were tested. This iterative approach helped us identify the best-fitting model for the data. 
+
+**8. Building and Evaluating Higher-Order Models:**
+
+As we iterated through different model orders, we built higher-order model and checked the performance. If the models had significant terms and improved upon previous models, we retained them as the final model. If not, we returned to the previous steps, selected the next highest correlated term, and continued building higher-order models until we arrived at the best model. 
+
+**9. Model Evaluation and Residual Assumption Check:**
+
+Once the final model was determined, we performed a Residual Assumption Check. This step involved evaluating key assumptions, such as homoscedasticity, normality of residuals, and the absence of autocorrelation. By verifying these assumptions, we ensured that our model met the necessary criteria for reliable predictions.
+
+# MAIN RESULTS OF THE ANALYSIS
+
+## Research Questions Result:
+
+Bases on the Correlation matrix [\hyperref[Figure 3.1]{Figure 3.1}] 
+
+The 3 most correlated terms are: 
+
+* Infant deaths 
+
+* Adult mortality 
+
+* Economy status Developed
+
+Result (Infant deaths): Based on the graphical analysis [\hyperref[Figure 3.2]{Figure 3.2}], there is a clear linear relationship between life expectancy and infant deaths. Life expectancy decreases as the number of infant deaths per 1,000 population increases. This indicates a significant negative correlation, where higher infant mortality is associated with shorter life expectancy. 
+
+ 
+Result (Adult mortality): The plot of life expectancy versus adult mortality [\hyperref[Figure 3.3]{Figure 3.3}] shows a strong inverse relationship. As adult mortality rates increase, life expectancy decreases significantly. This highlights the critical impact of adult mortality on life expectancy. 
+
+
+Result(Economy status): From graph [\hyperref[Figure 3.4]{Figure 3.4}], life expectancy is notably higher in developed countries compared to developing countries. The distinction between the two groups is evident, with developed countries consistently achieving higher life expectancy values. This underscores the role of economic status in influencing life expectancy. 
+
+ 
+ 
+## Multicollinearity Result: 
+
+### Initial Full Model: [\hyperref[Figure 3.5]{Figure 3.5}] 
+
+$Life Expectancy = 83.301550588 + 0.373540986 * RegionAsia + 1.945042477 * RegionCentral America and Caribbean -  0.657631937 * RegionEuropean Union + 0.267344658 * RegionMiddle East + 0.664637877 * RegionNorth America - 0.813834987 * RegionOceania + 0.280601144 * RegionRest of Europe + 1.734598696 * RegionSouth America + 0.071750017 * Year_{Y2001} + 0.083610190 * Year_{Y2002} + 0.004729251 * Year_{Y2003} + 0.035900270 * Year_{Y2004} - 0.001230519 * Year_{Y2005} + 0.014358678 * Year_{Y2006} + 0.043131386 * Year_{Y2007} + 0.097431267 * Year_{Y2008} + 0.155014184 * Year_{Y2009} + 0.238632483 * Year_{Y2010} + 0.268800877 * Year_{Y2011} + 0.295888104 * Year_{Y2012} + 0.410287395 * Year_{Y2013} + 0.505466388 * Year_{Y2014} + 0.528827324  * Year_{Y2015} - 0.052710586 * Infant_deaths - 0.051038167 * Under_five_deaths - 0.046575680 * Adult_mortality - 0.007583318 *  Hepatitis_B - 0.004477760 * Alcohol_consumption + 0.001943927 * Measles - 0.132934140 * BMI + 0.009792741  * Polio + 0.008138577 * Diphtheria + 0.090954743 * Incidents_HIV + 0.000020266  * GDP_per_capita - 0.000227516  * Population_mln - 0.036645320  * Thinness_ten_nineteen_years + 0.025003027 * Thinness_five_nine_years + 0.100686332  * Schooling +  2.501124616 * EconomyStatusDeveloped_{Yes}$
+
+**Outcome:** The initial VIF analysis detected multicollinearity for four predictors: Infant_deaths, Under_five_deaths, Polio, and Diphtheria. 
+
+**Reason for Detection:** High VIF values were observed, exceeding the commonly accepted threshold of 10 for Infant_deaths (48.20), Under_five_deaths (50.05), Polio (12.20), and Diphtheria (13.26), indicating strong collinearity among these variables. 
+
+**Resolution:** To address this issue, one variable was removed from each highly correlated pair. Specifically: 
+
+* Under_five_deaths was removed, as it was closely related to Infant_deaths. 
+
+* Diphtheria was removed, as it was closely related to Polio. 
+
+### Revised Model: [\hyperref[Figure 3.6]{Figure 3.6}] 
+
+**Outcome:** After excluding Under_five_deaths and Diphtheria, the VIF values were recalculated for the remaining predictors. 
+
+**Results:** No multicollinearity was detected in the revised model. The highest VIF values in the revised model (Infant_deaths: 8.64 and Thinness_five_nine_years: 9.20) were below the critical threshold, confirming that multicollinearity was sufficiently reduced. 
+
+**Significance:** The removal of collinear predictors improved model stability, ensuring that coefficients are more interpretable and estimates more reliable. 
+
+## F-Test Result Result:
+
+The F-test was conducted to determine if the revised model contains at least one predictor that significantly explains variation in life expectancy.  
+
+Based on image [\hyperref[Figure 3.7]{Figure 3.7}], the p-value for the F-test is extremely low, significantly below 0.05, which means that at least one predictor in the revised model significantly varies with life expectancy. This indicates that the revised model contains a predictor that is statistically significant in explaining the variation in life expectancy. 
+
+## Individual T-test Result:
+
+In the refined model, we removed the following insignificant variables: Alcohol_consumption, Measles, and Population_mln, as they had high p-values indicating no significant effect on life expectancy. The Year variable was kept because it is categorical, and if any year within the range is significant, the entire term is retained. The remaining predictors, including Region, Infant_deaths, Adult_mortality, Hepatitis_B, BMI, Polio, Incidents_HIV, GDP_per_capita, Thinness_ten_nineteen_years, Thinness_five_nine_years, Schooling, and Economy_status_Developed, were retained due to their strong statistical significance. 
+
+Output for those iteration are shown below in Figures,
+
+Model based on Full F-Test result, [\hyperref[Figure 3.8]{Figure 3.8}]
+Model After performing Individual t-test, [\hyperref[Figure 3.9]{Figure 3.9}]
+
+
+## Stepwise Result:
+
+The stepwise selection procedure resulted in a model with an adjusted R-squared of 0.9826, indicating a strong fit. Notably, the variables "Thickness_ten_nineteen_years" and "Thickness_five_nine_years" were not included, likely due to their minimal contribution to increasing the adjusted R-squared. However, we chose to proceed with the additive model that retains these thickness terms for comparison.
+
+Result of Step-wise Model Selection as image shown here, [\hyperref[Figure 3.10]{Figure 3.10}]
+
+
+## All-Possible-Regressions Selection Procedure:
+
+Based on output show in the image [\hyperref[Figure 3.24]{Figure 3.24}], The models in your output show improvement in fit as you progress from model 1 to model 13. Specifically, model with all variables provides the best balance of fit (high R-squared, low AIC, and BIC) with the smallest Mallows' Cp value, indicating that it has a good selection of predictor variables without excessive over-fitting. Therefore, model with all variables would likely be the most optimal model in this context.
+
+
+## Interaction model Result:
+
+For the interaction model, we began by including all pairwise interaction terms  and iteratively removed insignificant terms until all remaining interaction terms were statistically significant. However, we decided to proceed with the additive model. Although the adjusted R squared of the final interaction model (0.9921) was slightly higher than that of the additive model (0.9826), the improvement was minimal. Considering the risk of over-fitting with the interaction model, we chose the additive model for its simplicity and robustness.
+
+Result of Interaction Model Summary as image shown here, 
+
+[\hyperref[Figure 3.11]{Figure 3.11}]
+
+[\hyperref[Figure 3.12]{Figure 3.12}]
+
+## Higher order Result:
+
+For the higher-order model, we examined the correlation matrix and identified highly correlated terms, specifically Adult_mortality  and Infant_deaths. Incorporating second-order terms for these variables yielded adjusted R squared values of 0.9844 and 0.9835 , respectively. While these values show a slight improvement compared to the additive model (adjusted R squared = 0.9826), the increase is minimal. To avoid over fitting and maintain model simplicity, we decided not to proceed with the higher-order model and retained the additive model.
+
+Result of Higher Order Model Summary as image shown here, [\hyperref[Figure 3.13]{Figure 3.13}]
+
+
+## Residual Checking:
+
+### Linearity Assumption Result:
+
+The linearity assumption was assessed using Residuals vs Fitted Values plots as show below,
+
+[\hyperref[Figure 3.14]{Figure 3.14}]
+[\hyperref[Figure 3.15]{Figure 3.15}]
+[\hyperref[Figure 3.16]{Figure 3.16}]
+[\hyperref[Figure 3.17]{Figure 3.17}]
+[\hyperref[Figure 3.18]{Figure 3.18}]
+
+Adjustments were made to address initial non-linear patterns by integrating second-order and third-order terms for highly correlated predictors, Adult_mortality and Infant_deaths, respectively. After these modifications, the residuals from the plot showed no discernible pattern, indicating the linearity assumption was satisfied. The final model, incorporating these higher-order terms, achieved an adjusted R squared value of 0.9846 and an RMSE of 1.167, demonstrating strong predictive accuracy.
+
+### Independence Assumption Result:
+
+The independence assumption is satisfied as our data is not related to time, space, or group, ensuring that the residuals are independent of each other.
+
+### Equal Variance Assumption Result:
+
+A significant result, p-value < 2.2e-16 which is less than 0.05 from the Breusch-Pagan test suggests heteroscedasticity, meaning the variance of the residuals is not constant across levels of the independent variables. We reject null hypothesis.
+
+[\hyperref[Figure 3.19]{Figure 3.19}]
+
+After applying the Box-Cox transformation in an attempt to resolve the issue of heteroscedasticity, the Breusch-Pagan test confirmed that heteroscedasticity still persists in the residuals, indicating that the transformation was not sufficient to address the variance instability.
+
+[\hyperref[Figure 3.19]{Figure 3.19}]
+
+[\hyperref[Figure 3.20]{Figure 3.20}]
+
+
+## Normality Assumption:
+
+Plotted Q-Q plot [\hyperref[Figure 3.21]{Figure 3.21}], indicate that the residuals follow a normal distribution. This suggests that the normality assumption of the regression model is satisfied.
+
+The Shapiro-Wilk normality test further supports that the residuals are normally distributed, as the p-value (0.06246) is greater than 0.05. Therefore, we fail to reject the null hypothesis, indicating that the residuals follow a normal distribution.
+
+[\hyperref[Figure 3.22]{Figure 3.22}]
+
+## Outliers Result:
+
+Based on the graph, there are no outliers identified using Cook's Distance with a threshold of 0.5. This indicates that no observations exceed this threshold and are deemed influential in the context of the model.
+
+[\hyperref[Figure 3.23]{Figure 3.23}]
+
+**Final Model Equation Result:**
+
+$\hat{Life_expectancy} = 83.846 + 0.5985 * Region_{Asia} + 2.134 * Region_{Central America and Caribbean} - 0.5379 * Region_{European Union} + 0.07193 * Region_{Middle East} + 0.7183 * Region_{North America} - 0.4468 * Region_{Oceania} + 0.3035 * Region_{Rest of Europe} - 1.885 * Region_{South America} + 0.06593 * Year_{Y2001} + 0.06393 * Year_{Y2002} + 0.004886 * Year_{Y2003} + 0.05015 * Year_{Y2004} + 0.01471 * Year_{Y2005} + 0.04960 * Year_{Y2006} + 0.08880 * Year_{Y2007} + 0.1522 * Year_{Y2008} + 0.2178 * Year_{Y2009} + 0.2926 * Year_{Y2010} + 0.3463 * Year_{Y2011} + 0.3679 * Year_{Y2012} + 0.4794 * Year_{Y2013} + 0.5691 * Year_{Y2014} + 0.5864 * Year_{Y2015} - 0.1189 * InfantDeaths - 0.0003900 * InfantDeaths^2 + 0.000003453 * InfantDeaths^3 - 0.06159 * AdultMortality + 0.00002649 * AdultMortality^2 + 0.01159 * HepatitisB - 0.1046 * BMI + 0.01180 * Polio - 0.03977 * IncidentsHIV + 0.000007030 * GDP_per_capita - 0.04017 * ThinnessTenNineteenYears + 0.04967 * ThinnessFiveNineYears + 0.1097 * Schooling + 2.084 * EconomyStatusDeveloped_{Yes}$
+
+**Interpretation:**
+
+**Intercept:** This is the baseline life expectancy when all the other variables are zero life expentancy would be 8.385 years. It's the starting point of the model. 
+
+**Region:** Each coefficient for a specific region (e.g., Region_{Asia}, Region_{Central America and Caribbean}) represents the change in life expectancy relative to the baseline region (which is Africa). A positive coefficient indicates that life expectancy is higher in that region compared to the baseline region, while a negative coefficient means life expectancy is lower. For example, Region_{Asia} = 0.5985 indicates life expectancy in Asia is 0.5985 years higher than the baseline region. And Region_{Oceania} = - 0.4468 indicates life expectancy in Oceania is 0.5985 years lower than the baseline region. 
+
+**Year:** Each coefficient for a year (e.g., Year_{Y2001}, Year_{Y2002}) represents the change in life expectancy relative to the baseline year (usually the year not included in the model, such as Y2000). A positive coefficient indicates that life expectancy has increased in that particular year compared to the baseline year, while a negative coefficient suggests a decrease. For instance, Year_{Y2001} = 0.06593 means life expectancy in 2001 is 0.06593 years higher than in the baseline year. 
+
+**InfantDeaths:** The negative coefficient for InfantDeaths (-0.1189) suggests that an increase in infant deaths decreases life expectancy.If InfantDeaths increases by one unit, the life expectancy decreases by 0.1189 years, assuming all other factors are constant. This suggests that higher infant death rates are negatively associated with life expectancy, meaning that as infant deaths increase, the overall life expectancy in the population decreases.  
+
+**InfantDeaths^2:** The negative coefficient for the square of The Quadratic term (-0.0003900 * InfantDeaths^2) increase in infant deaths increase life expectancy. If InfantDeaths^2 increases by one unit, the life expectancy decreases by 0.0003900 years, assuming all other factors are constant. This suggests that as infant deaths increase, the negative impact on life expectancy accelerates in a non-linear way. The quadratic term captures the increasing severity of infant mortality's effect on life expectancy as the number of infant deaths rises. 
+
+
+**InfantDeaths^3:** The negative coefficient for the square of The Cubic term increase in infant deaths decreases life expectancy. If InfantDeaths^3 increases by one unit, the life expectancy increases by 0.000003453 years, assuming all other factors are constant. Although this term represents a non-linear relationship, the small positive coefficient suggests that while the impact of infant deaths accelerates as the number of deaths increases, the overall effect on life expectancy remains relatively minimal compared to the quadratic and linear terms. 
+
+**AdultMortality:** The negative coefficient for AdultMortality suggests that higher adult mortality decreases life expectancy. If AdultMortality increases by one unit, the life expectancy decreases by 0.06159 years, assuming all other factors are constant. This suggests that higher adult mortality rates are negatively associated with life expectancy, meaning as more adults die, the overall life expectancy in the population decreases. 
+
+  
+
+**AdultMortality^2:** The positive coefficient for the square of AdultMortality indicates that as adult mortality increases, its impact on life expectancy accelerates. If AdultMortality^2 increases by one unit, life expectancy increases by 0.00002649 years, assuming all other factors are constant. This suggests that the relationship between adult mortality and life expectancy is non-linear. In other words, as adult mortality rises, its impact on life expectancy accelerates, but at a diminishing rate due to the small coefficient. 
+ 
+
+**Hepatitis B:** The coefficient 0.01159 suggests a positive relationship, meaning that higher levels of Hepatitis B increase life expectancy, If Hepatitis B increases by one unit, the interpretation based on the coefficient would be that life expectancy increases by 0.01159 years, assuming all other factors are constant which is counterintuitive. Hepatitis B typically reduces life expectancy, so this could be a model result artifact. 
+
+**BMI:** The negative coefficient for BMI (-0.1046) suggests that higher BMI (indicating obesity) decreases life expectancy. If BMI increases by one unit, the interpretation based on the coefficient -0.1046 would be that life expectancy decreases by 0.1046 years, assuming all other factors are constant. 
+
+**Polio:** The positive coefficient (+0.01180) means that higher polio vaccination rates increase life expectancy. If Polio increases by one unit, life expectancy increases by 0.01180 years, assuming all other factors are constant. This suggests that higher rates of polio vaccination or the presence of polio control measures are positively associated with life expectancy, likely due to improved public health outcomes resulting from vaccination efforts. 
+
+ 
+**IncidentsHIV:** The negative coefficient (-0.03977) indicates that higher rates of HIV incidents are associated with lower life expectancy. If IncidentsHIV increases by one unit, life expectancy decreases by 0.03977 years, assuming all other factors are constant. This suggests that higher rates of HIV incidents are negatively associated with life expectancy. 
+
+**GDP_per_capita:** A positive coefficient here suggests that increases in GDP per capita are associated with higher life expectancy. If GDP_per_capita increases by one unit, the life expectancy increases by 0.000007030 years, assuming all other factors are constant. This suggests that higher GDP per capita, which typically indicates a stronger economy and better access to healthcare, is positively associated with life expectancy. 
+
+
+**ThinnessTenNineteenYears:** These coefficients show the relationship between malnutrition in certain age groups and life expectancy. For the terms -0.04017 * ThinnessTenNineteenYears a negative coefficient for ThinnessTenNineteenYears indicates that higher thinness rates in this age group (10-19 years) are associated with a decrease in life expectancy. If ThinnessTenNineteenYears increases by one unit, the life expectancy decreases by 0.04017 years, assuming all other factors are constant. This suggests that higher thinness (indicating malnutrition or poor health) in the 10-19 age group is negatively associated with life expectancy. 
+
+**ThinnessFiveNineYears:** These coefficients show the relationship between malnutrition in certain age groups and life expectancy. For the terms 0.04967 * ThinnessFiveNineYears A positive coefficient for ThinnessFiveNineYears suggests that higher thinness rates in the 5-9 age group are linked to an increase in life expectancy. If ThinnessFiveNineYears increases by one unit, the life expectancy increases by 0.04967 years, assuming all other factors are constant. This suggests that higher thinness rates (indicating malnutrition) in the 5-9 age group are positively associated with life expectancy, which could be counterintuitive. 
+
+**Schooling:** More years of schooling are associated with higher life expectancy, as expected from the positive coefficient (0.1097). If Schooling increases by one unit, the life expectancy increases by 0.1097 years, assuming all other factors are constant. This suggests that more years of schooling are positively associated with life expectancy 
+
+**EconomyStatusDeveloped:** This binary variable indicates whether a country is considered developed. If developed, life expectancy is increased by 2.084 years. If EconomyStatusDeveloped increases by one unit, the life expectancy increases by 2.084 years, assuming all other factors are constant. This suggests that being in a developed country, characterized by higher economic status, is positively associated with life expectancy. 
+
+**Lets derive some sub-models:**
+
+1. For Region = Asia, Year = 2002 and developed countries Life expectancy,
+
+$Life expectancy = 86.59243 - 0.1189 * InfantDeaths - 0.0003900 * InfantDeaths^2 + 0.000003453 * InfantDeaths^3 - 0.06159 * AdultMortality + 0.00002649 * AdultMortality^2 + 0.01159 * HepatitisB - 0.1046 * BMI + 0.01180 * Polio - 0.03977 * IncidentsHIV + 0.000007030 * GDP_per_capita - 0.04017 * ThinnessTenNineteenYears + 0.04967 * ThinnessFiveNineYears + 0.1097 * Schooling$
+
+2. For Region = North America, Year = 2010 and developed countries Life expectancy,
+
+$Life expectancy = 86.9409 - 0.1189 * InfantDeaths - 0.0003900 * InfantDeaths^2 + 0.000003453 * InfantDeaths^3 - 0.06159 * AdultMortality + 0.00002649 * AdultMortality^2 + 0.01159 * HepatitisB - 0.1046 * BMI + 0.01180 * Polio - 0.03977 * IncidentsHIV + 0.000007030 * GDP_per_capita - 0.04017 * ThinnessTenNineteenYears + 0.04967 * ThinnessFiveNineYears + 0.1097 * Schooling$
+
+
+3. For Region = Africa, Year = 2007 and developing countries Life expectancy,
+
+$\hat{Life_expectancy} = 83.9348 - 0.1189 * InfantDeaths - 0.0003900 * InfantDeaths^2 + 0.000003453 * InfantDeaths^3 - 0.06159 * AdultMortality + 0.00002649 * AdultMortality^2 + 0.01159 * HepatitisB - 0.1046 * BMI + 0.01180 * Polio - 0.03977 * IncidentsHIV + 0.000007030 * GDP_per_capita - 0.04017 * ThinnessTenNineteenYears + 0.04967 * ThinnessFiveNineYears + 0.1097 * Schooling$
+
+
+**Prediction:**
+
+Based on the model, we observe that economic status and GDP per capita have higher coefficients, indicating a strong influence on life expectancy. Using the model's predict() function, we can quantify the impact of these predictors and analyze how changes in their values affect life expectancy.
+
+The model predicts that Canada, with its developed economy, strong healthcare system, and higher economic indicators, has a significantly higher life expectancy of 81.35 years, compared to Mexico, which has a life expectancy of 73.75 years. Mexico's status as a developing country, with greater healthcare challenges and lower economic performance, contributes to this disparity.
+
+This analysis underscores the critical role of economic development, healthcare access, and education in shaping a country's overall life expectancy. Specifically, Canada's life expectancy is approximately 7.6 years higher than Mexico's, highlighting the importance of addressing systemic disparities to improve global health outcomes.
+
+\newpage
+# CONCLUSION AND DISCUSSION
+
+## Approach
+
+The approach used in this analysis demonstrates a systematic and effective framework for understanding the determinants of life expectancy globally. The key steps, from initial data cleaning to higher-order model refinement, ensured both the robustness and interpretability of the findings.
+
+
+### Effectiveness of the Approach: 
+
+* **Data Simplification:** The decision to use the Region variable instead of the Country variable reduced the complexity of handling 193 unique country entries while still allowing for meaningful regional insights. 
+
+* **Multicollinearity Resolution:** The rigorous application of VIF to identify and address multicollinearity enhanced the model’s stability and interpretability. Removing highly collinear variables, such as Under_five_deaths and Diphtheria, allowed for a more robust model. 
+
+* **Model Refinement:** The use of stepwise regression and evaluation criteria like AIC, BIC, and Mallows’ Cp ensured the selection of the most parsimonious model. 
+
+* **Higher-order and Interaction Models:** These advanced modeling techniques captured non-linear relationships and synergies between predictors, providing a more nuanced understanding of the factors influencing life expectancy. 
+
+* **Validation of Residual Assumptions:** The adherence to key statistical assumptions, including normality and homoscedasticity, further bolstered the reliability of the findings. 
+
+### Challenges and Trade-offs: 
+
+* The exclusion of country-specific details, while necessary to simplify the analysis, limited the ability to identify unique country-level characteristics  national trends or outliers. 
+
+* The refinement process, especially testing interaction and higher-order terms, was resource-intensive and required careful attention to ensure statistical validity. 
+
+* Despite these challenges, the rigorous validation of assumptions (normality, homoscedasticity, and independence) strengthened the model's reliability. 
+
+## Future Work 
+
+**1. Granular Data Analysis:**
+
+* Include additional country-specific variables, such as healthcare expenditure, literacy rates, or environmental indices, to uncover country-level insights. 
+
+* Extend the dataset to include more recent years or incorporate data from specific events, such as the COVID-19 pandemic, to analyze temporal changes in life expectancy determinants. 
+
+**2. Advanced Modeling Techniques:**
+
+* Explore machine learning approaches, such as Random Forest, XGBoost, or Neural Networks, to handle interactions and non-linear relationships more efficiently. 
+
+**2. Policy Simulation and Impact Assessment:**
+
+* Use the refined models to simulate the impact of targeted interventions, such as reducing infant mortality or increasing vaccination rates, on life expectancy. 
+
+* Compare life expectancy determinants between developed and developing regions to identify specific strategies that could improve outcomes in each context. 
+
+**3. Interactive Reporting and Visualization:**
+
+* Develop interactive dashboards using tools like R Shiny to visualize results and allow stakeholders to explore data dynamically. 
+
+* Create regional or country-specific visualizations to highlight disparities and suggest actionable recommendations. 
+
+**4. Validation and Generalization:**
+
+* Validate the model using external datasets to assess its robustness and generalizability. 
+
+By addressing these areas, future studies can deepen the understanding of life expectancy determinants and further enhance the impact of this work on global health policies and interventions. 
+
+
+
+\newpage
+# REFERENCES
+
+\label{ref1} [1] L. Gochia, "Life expectancy (WHO) fixed dataset," Kaggle, 2023. [Online]. Available: https://www.kaggle.com/datasets/lashagoch/life-expectancy-who-updated. [Accessed: Nov, 30, 2024].
+
+
+\newpage
+# APPENDIX
+
+## Images
+
+\label{Figure 2.1} ![WorkFlow Diagram](images/WorkFlow Diagram Fig2.1.jpg)
+$$Figure 2.1 WorkFlow Diagram$$
+
+
+\section*{}
+\label{Figure 2.2} ![ Infant vs Frequancy](images/Infant vs Frequancy.png)
+$$Figure 2.2 Infant vs Frequancy$$
+
+\section*{}
+\label{Figure 2.3} ![Adult Mortality vs Frequency](images/Adult mortality vs fequancy.png)
+$$Figure 2.3 Adult Mortality vs Frequency$$
+
+\section*{}
+\label{Figure 2.4} ![Alcohol consumptions VsFrequancy](images/Alcohol consumptions vs frequancy.png)
+$$Figure 2.4 Alcohol consumptions VsFrequancy$$
+
+\section*{}
+\label{Figure 2.5} ![Hepatitis B vs Frequancy](images/Hepatitis B vs Frequancy.png)
+$$Figure 2.5 Hepatitis B vs Frequancy$$
+
+\section*{}
+\label{Figure 2.6} ![Meales vs Frequancy](images/Meales vs Frequancy.png)
+$$Figure 2.6 Meales vs Frequancy$$
+
+\section*{}
+\label{Figure 2.7} ![BMI vs Frequancy](images/BMI vs Frequancy.png)
+$$Figure 2.7 BMI vs Frequancy$$
+
+
+\section*{}
+\label{Figure 2.8} ![Polio vs Frequancy](images/Polio vs Frequancy.png)
+$$Figure 2.8 Polio vs Frequancy$$
+
+\section*{}
+\label{Figure 2.9} ![Diphtheria vs Frequancy](images/Diphtheria vs Frequancy.png)
+$$Figure 2.9 Diphtheria vs Frequancy$$
+
+\section*{}
+\label{Figure 2.10} ![HIV vs Frequacy](images/HIV vs Frequacy.png)
+$$Figure 2.10 HIV vs Frequacy$$
+
+\section*{}
+\label{Figure 2.11} ![GDP vs Frequancy](images/GDP vs Frequancy.png)
+$$Figure 2.11 GDP vs Frequancy$$
+
+\section*{}
+\label{Figure 2.12} ![Population vs Frequncy](images/Population vs Frequncy.png)
+$$Figure 2.12 Population vs Frequncy$$
+
+\section*{}
+\label{Figure 2.13} ![Thinness Five nine vs Frequancy](images/Thinness Five nine vs Frequancy.png)
+$$Figure 2.13 Thinness Five nine vs Frequancy$$
+
+\section*{}
+\label{Figure 2.14} ![Thinness ten nineteen vs Frequancy](images/Thinness ten nineteen vs Frequancy.png)
+$$Figure 2.14 Thinness ten nineteen vs Frequancy$$
+
+\section*{}
+\label{Figure 2.15} ![schooling vs Frequancy](images/schooling vs Frequancy.png)
+$$Figure 2.15 schooling vs Frequancy$$
+
+
+\section*{}
+\label{Figure 3.1} ![Correlation Matrix](images/Correlation Matrix.png)
+$$Figure 3.1 Correlation Matrix$$
+
+\section*{}
+\label{Figure 3.2} ![EDA Infants Death](images/EDA Infants Death.png){width=80%}
+$$Figure 3.2 EDA Infants Death$$
+
+\section*{}
+\label{Figure 3.3} ![EDA Adult Mortality Rate](images/EDA adult mortality rate.png){width=80%}
+$$Figure 3.3 EDA Adult Mortality Rate$$
+
+\section*{}
+\label{Figure 3.4} ![EDA Economy Status](images/EDA Economy status.png){width=80%}
+$$Figure 3.4 EDA Economy Status$$
+\section*{}
+\label{Figure 3.5} ![Multicollinearity for Full Model](images/Multicollinearity for full model.png)
+$$Figure 3.5 Multicollinearity for Full Model$$
+
+\section*{}
+\label{Figure 3.6} ![Multicollinearity for Revised Model](images/Multicollinearity for revised model.png)
+$$Figure 3.6 Multicollinearity for Revised Model$$
+
+\section*{}
+\label{Figure 3.7} ![Anova Table](images/Anova table.png)
+$$Figure 3.7 Anova Table$$
+
+\section*{}
+\label{Figure 3.8} ![Model based on Full F-Test Output](images/Model 1.png)
+$$Figure 3.8 Model based on Full F-Test Output$$
+
+\section*{}
+\label{Figure 3.9} ![Model After performing Individual t-test and Removing Insignificant terms](images/Model 2.png)
+$$Figure 3.9 Model After performing Individual t-test and Removing Insignificant terms$$
+
+\section*{}
+\label{Figure 3.10} ![Result of Step-wise Model Selection](images/Stepwise model.png)
+$$Figure 3.10 Result of Step-wise Model Selection$$
+
+\section*{}
+\label{Figure 3.24} ![All-Possible-Regressions Selection Procedure](images/All-Possible-Regressions Selection Procedure.png)
+$$Figure 3.24 All-Possible-Regressions Selection Procedure$$
+
+\section*{}
+\label{Figure 3.11} ![Result of Interaction Model Summary](images/Interaction model.png)
+$$Figure 3.11 Result of Interaction Model Summary - I$$
+
+\section*{}
+\label{Figure 3.12} ![Result of Interaction Model Summary](images/Interaction model part 2.png)
+$$Figure 3.12 Result of Interaction Model Summary - II$$
+
+\section*{}
+\label{Figure 3.13} ![Result of Higher Order Model Summary](images/Higher order.png)
+$$Figure 3.13 Result of Higher Order Model Summary$$
+
+\section*{}
+\label{Figure 3.14} ![Result of Residuals vs Fitted Values - I](images/Residuals vs Fitted Values 1.png)
+$$Figure 3.14 Result of Residuals vs Fitted Values - I$$
+
+\section*{}
+\label{Figure 3.15} ![Result of Residuals vs Fitted Values - II](images/Residuals vs Fitted Values 2.png)
+$$Figure 3.15 Result of Residuals vs Fitted Values -II$$
+
+\section*{}
+\label{Figure 3.16} ![Result of Residuals vs Fitted Values - III](images/Residuals vs Fitted Values 3.png)
+$$Figure 3.16 Result of Residuals vs Fitted Values -III$$
+
+\section*{}
+\label{Figure 3.17} ![Result of Residuals vs Fitted Values - IV](images/Residuals vs Fitted Values 4.png)
+$$Figure 3.17 Result of Residuals vs Fitted Values -IV$$
+
+\section*{}
+\label{Figure 3.18} ![Result of Residuals vs Fitted Values - V](images/Residuals vs Fitted Values 5.png)
+$$Figure 3.18 Result of Residuals vs Fitted Values -V$$
+
+\section*{}
+\label{Figure 3.19} ![Breusch-Pagan Test 1](images/Breusch-Pagan test 1.png)
+$$Figure 3.19 Breusch-Pagan Test 1$$
+
+\section*{}
+\label{Figure 3.20} ![BoxCox Plot](images/Box cox plot.png)
+$$Figure 3.20 BoxCox Plot$$
+
+\section*{}
+\label{Figure 3.21} ![Breusch-Pagan Test 2](images/Breusch-Pagan test 2.png)
+$$Figure 3.21 Breusch-Pagan Test 2$$
+
+\section*{}
+\label{Figure 3.22} ![QQ Plot](images/QQ plot.png)
+$$Figure 3.22 QQ Plot 2$$
+
+\section*{}
+\label{Figure 3.23} ![Cooks Distance Plot](images/Cooks Distance Plot.png)
+$$Figure 3.23 Cooks Distance Plot$$
